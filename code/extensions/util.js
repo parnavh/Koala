@@ -1,7 +1,8 @@
 const fs = require('fs');
 const { prefix } = require('../../config.json');
 const bot = require('../main/bot.js')
-const { MessageEmbed } = require('discord.js')
+const { MessageEmbed, VoiceChannel } = require('discord.js')
+const { joinVoiceChannel, getVoiceConnection, createAudioPlayer, AudioPlayerStatus } = require("@discordjs/voice");
 
 module.exports = class Util {
 
@@ -135,5 +136,18 @@ module.exports = class Util {
         return true
     }
 
-    timer = ms => new Promise( res => setTimeout(res, ms));
+    timer = ms => new Promise(res => setTimeout(res, ms));
+
+    /**
+     * @param {VoiceChannel} channel 
+     */
+    joinVoice(channel) {
+        return joinVoiceChannel({
+            channelId: channel.id,
+            guildId: channel.guild.id,
+            adapterCreator: channel.guild.voiceAdapterCreator,
+        })
+    }
+
+    getVoice = getVoiceConnection;
 };

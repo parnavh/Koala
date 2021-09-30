@@ -4,20 +4,21 @@
   "description": "My own all in own discord bot",
   "main": "code/main/index.js",
   "scripts": {
-    "start": "node code\\main\\index.js",
+    "start": "nodemon code\\main\\index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Parnav Harinathan",
   "license": "ISC",
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
+    "@discordjs/voice": "^0.6.0",
     "aws-sdk": "^2.817.0",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.1.0",
     "ffmpeg-static": "^4.2.7",
     "firebase-admin": "^9.8.0",
-    "firebase-functions": "^3.14.1",
     "node-fetch": "^2.6.1",
     "rimraf": "^3.0.2",
+    "tweetnacl": "^1.0.3",
     "twemoji-parser": "^13.1.0"
   }
 }

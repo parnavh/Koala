@@ -16,22 +16,24 @@ module.exports = {
         } else {
             channels = [`${message.channel.id}`];
         }
-        var final ='';        
+        var final ='', skip = false;        
         for(var a of args){
             if(!a.startsWith('<#')) {
                 var t = a.toString();
                 if(!isNaN(t)&&!isNaN(parseFloat(t))){
-                    final = a ;
+                    final = a;
                     break;
                 }
             }
+
+            if(a == "-y") skip = true;
         }
         if(final==''){
             return message.reply("You didn't specify the number of messages to be deleted in the proper format.");
         }
 
         var check = '',collected, delete1 ,delete2 ;
-        if(channels.length>2){
+        if(channels.length>2 && !skip) {
             check = `Do you really want to clear \`${final}\` messages from the following channels?\n`
             for(var c of channels){
                 check+=`<#${c}> `;
@@ -51,9 +53,9 @@ module.exports = {
             } catch (error) {
                 delete2 = await message.channel.send("No valid input provided in time, Terminating the command");
                 try {
-                    delete1.delete({timeout : 4000});
-                    delete2.delete({timeout : 4000});
-                    message.delete({timeout : 4000});
+                    delete1.delete();
+                    delete2.delete();
+                    message.delete();
                 } catch (error) {}
                 return;
             }
@@ -62,10 +64,10 @@ module.exports = {
             if(inp == 'n' || inp == 'no'){
                 delete2 = await message.channel.send("Okay, Terminating the command");
                 try {
-                    delete1.delete({timeout : 4000});
-                    delete2.delete({timeout : 4000});
-                    collected.first().delete({timeout : 4000});
-                    message.delete({timeout : 4000});
+                    delete1.delete();
+                    delete2.delete();
+                    collected.first().delete();
+                    message.delete();
                 } catch (error) {}
                 return;
             }
@@ -108,19 +110,23 @@ module.exports = {
         if(e.length==0){
             const msg = await message.channel.send(`The messages have been deleted 👍`);
             try {
-                msg.delete({timeout : 4000});
+                setTimeout(() => {
+                    msg.delete();
+                }, 10000);
             } catch (error) {}
         } else {
             const msg = await message.channel.send(e, {split : true});
             for(var m=0;m<msg.length;m++){
                 try {
-                    msg[m].delete({timeout : 10000});
+                    setTimeout(() => {
+                        msg[m].delete();
+                    }, 10000);
                 } catch (error) {}
             }
             try {
-                message.delete({timeout : 10000});
-                delete1.delete({timeout : 10000});
-                collected.first().delete({timeout : 10000});
+                message.delete();
+                delete1.delete();
+                collected.first().delete();
             } catch (error) {}
         }
     }

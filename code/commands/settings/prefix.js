@@ -31,7 +31,7 @@ module.exports = {
 
         if(!args[0]) return message.channel.send(preff);
 
-        if(!message.member.hasPermission('MANAGE_SERVER')) return message.channel.send('You do not have the permission to change the prefix');
+        if(!message.member.permissions.has('MANAGE_SERVER')) return message.channel.send('You do not have the permission to change the prefix');
 
         let text = args.join(' ');
         text = text.trim();

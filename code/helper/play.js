@@ -3,6 +3,7 @@ const AWS = require("aws-sdk");
 AWS.config.loadFromPath("config_aws.json");
 const polly = new AWS.Polly();
 const { VoiceChannel } = require("discord.js");
+const { createAudioPlayer, createAudioResource } = require('@discordjs/voice')
 module.exports = {
     name: "play",
     description: "Module which is responsible for playing audio",
@@ -16,7 +17,7 @@ module.exports = {
         const { client } = vc;
         const { voice } = client.cache;
         const guid = vc.guild.id;
-        let connection = vc.guild.me.voice ? vc.guild.me.voice.connection : null;
+        let connection = client.util.getVoice(guid);
         
         const soundPath = `./junk/temp/${guid}.mp3`;
         
@@ -28,25 +29,27 @@ module.exports = {
         };
         
         if (!voice[guid])
-        voice[guid] = {
-            queue: [],
-            vc: [],
-            delay: [],
-            isPlaying: false,
-            dispatcher: null,
-        };
+            voice[guid] = {
+                queue: [],
+                vc: [],
+                delay: [],
+                speaker : [],
+                isPlaying: false,
+                player: createAudioPlayer()
+            };
 
-        server = voice[guid];
+        let server = voice[guid];
+        let { player } = server;
         
         server.isPlaying = true;
 
-        if (!connection || vc.id != connection.channel.id) {
+        if (!connection || vc.id != vc.guild.me.voice.channelId) {
             try {
-                connection = await vc.join();
+                connection = await client.util.joinVoice(vc)
                 await client.util.timer(100 + delay)
             } catch (error) {
                 server.isPlaying = false;
-                console.error("Play.js 33\n" + error);
+                console.error("Play.js 47\n" + error);
                 return
             }
         }
@@ -64,8 +67,10 @@ module.exports = {
                         return console.error(err);}
                     else {
                         try {
-                            server.dispatcher = connection.play(soundPath);
+                            player.play(createAudioResource(soundPath));
+                            connection.subscribe(player);
                         } catch (error) {
+                            console.log(server);
                             console.log(error);
                             server.isPlaying = false;
                             if (server.queue[0]) {
@@ -84,7 +89,7 @@ module.exports = {
                             }
                             return;
                         }
-                        server.dispatcher.on("finish", () => {
+                        player.on('idle', () => {
                             server.isPlaying = false;
                             if (server.queue[0]) {
                                 client.helper
@@ -100,7 +105,7 @@ module.exports = {
                                 server.speaker.shift();
                                 server.delay.shift();
                             }
-                        });
+                        })
                     }
                 });
             }

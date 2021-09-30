@@ -19,72 +19,78 @@ module.exports = {
     category : 'mod',
 
 
-    async execute(client,message,args){
-
+    async execute(client, message, args){
         var channels = [];
-        if(message.mentions.channels.first()){
+        if(message.mentions.channels.first())
             message.mentions.channels.map(cha => channels.push(cha.id));
-        } else {
+        else
             channels = [`${message.channel.id}`];
-        }
 
-        var check = '', collected , delete1, delete2;
-        if(channels.length==1){
-            if(channels[0]==message.channel.id)
-                check = 'Do you really want to nuke this channel?'
-            else 
-                check = `Do you really want to nuke the <#${channels[0]}> channel?`
-        } else {
-            check = 'Do you really want to nuke the following channels?\n'
-            for(var c of channels){
-                check+=`<#${c}> `;
-            }
-            check+= '\n(*Beware using this command will cause problems with other bots which try to find the other channel as a clone will replace the original channel, you will have to set it up again with other bots and even with me if you have the channel setup for something*)'
-        }
-        check+='\nType \`y\`(yes) or \`n\`(no) in \`15\` seconds';
-        delete1  = await message.channel.send(check);
-
-        const acceptable = ['y','yes','n','no'];
-        const filter = m => (m.author.id==message.author.id && acceptable.includes(m.content));
+        let skip = false;
         
-        try {
-            collected = await message.channel.awaitMessages(filter,{
-                time : '15000',
-                max : '1',
-                errors : ['time']
-            })
-        } catch (error) {
-            delete2 = await message.channel.send("No valid input provided in time, Terminating the command");
-            try {
-                delete1.delete({timeout : 4000});
-                delete2.delete({timeout : 4000});
-                message.delete({timeout : 4000});
-            } catch (error) {}
-            return;
+        for (var a of args) {
+            if(a == "-y") skip = true;
         }
-    
-        var inp = collected.first().content.toLowerCase();
 
-        if(inp == 'n' || inp == 'no'){
-            delete2 = await message.channel.send("Okay, Terminating the command");
+        if(!skip) {
+            var check = '', collected , delete1, delete2;
+            if(channels.length == 1){
+                if(channels[0]==message.channel.id)
+                    check = 'Do you really want to nuke this channel?'
+                else 
+                    check = `Do you really want to nuke the <#${channels[0]}> channel?`
+            } else {
+                check = 'Do you really want to nuke the following channels?\n'
+                for(var c of channels){
+                    check+=`<#${c}> `;
+                }
+                check+= '\n(*Beware using this command will cause problems with other bots which try to find the other channel as a clone will replace the original channel, you will have to set it up again with other bots and even with me if you have the channel setup for something*)'
+            }
+            check+='\nType \`y\`(yes) or \`n\`(no) in \`15\` seconds';
+            delete1  = await message.channel.send(check);
+
+            const acceptable = ['y','yes','n','no'];
+            const filter = m => (m.author.id == message.author.id && acceptable.includes(m.content));
+            
             try {
-                delete1.delete({timeout : 4000});
-                delete2.delete({timeout : 4000});
-                collected.first().delete({timeout : 4000});
-                message.delete({timeout : 4000});
-            } catch (error) {}
-            return;
+                collected = await message.channel.awaitMessages(filter, {
+                    time : '15000',
+                    max : '1',
+                    errors : ['time']
+                })
+            } catch (error) {
+                delete2 = await message.channel.send("No valid input provided in time, Terminating the command");
+                try {
+                    delete1.delete();
+                    delete2.delete();
+                    message.delete();
+                } catch (error) {}
+                return;
+            }
+
+            var inp = collected.first().content.toLowerCase();
+
+            if(inp == 'n' || inp == 'no'){
+                delete2 = await message.channel.send("Okay, Terminating the command");
+                try {
+                    delete1.delete();
+                    delete2.delete();
+                    collected.first().delete();
+                    message.delete();
+                } catch (error) {}
+                return;
+            }
         }
 
         var err = [],temp = '',newName = '';
-        for(var c of channels){
+        for(var c of channels) {
             try {
                 temp = makeid(12);
                 var channel = client.channels.cache.find(chan => chan.id==c);
                 options = {
                     name : temp
                 }
-                var newChannel = await channel.clone(options)
+                var newChannel = await channel.clone(options);
                 await newChannel.setPosition(channel.position);
                 newName = channel.name;
                 channel.delete();
@@ -93,12 +99,11 @@ module.exports = {
                 err.push(`${error}\nWhile nuking channel <#${c}>`);
             }
         }
-        var channel = message.guild.channels.cache.map( cha => cha.id == message.channel.id)
-        if(channel.id){
+
+        if(message.channel) {
+            err.length != 0 && message.channel.send(err)
             try {
-                message.delete({timeout : 10000});
-                delete1.delete({timeout : 10000});
-                collected.first().delete({timeout : 10000});
+                message.delete();
             } catch (error) {}
         }
     }

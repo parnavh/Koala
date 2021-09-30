@@ -24,7 +24,7 @@
 		  "module.exports = {",
 		  "    name : '$TM_FILENAME_BASE',",
 		  "    aliases : [''],",
-		  "    description : '',",
+		  "    description : '$0',",
 		  "    usage : '',",
 		  "    args : false,",
 		  "    perms : ['SEND_MESSAGES'],",
@@ -36,7 +36,7 @@
 		  "     * @param {bot} client",
 		  "     * @param {Array} args",
 		  "    */",
-		  "    execute(client,message,args){",
+		  "    async execute(client,message,args){",
 		  "        ",
 		  "    }",
 		  "};"

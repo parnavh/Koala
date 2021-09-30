@@ -50,7 +50,7 @@ module.exports = {
             .setAuthor(`${message.guild.name}'s Help Menu`, message.guild.iconURL({dynamic : true}))
             .setFooter(`At your service, ${message.member.displayName}`, message.author.displayAvatarURL({dynamic : true}));
             
-        const {commands} = client;
+        const { commands } = client;
 
         const guilds = []
         commands.filter(m => m.guild).forEach(m => {
@@ -68,7 +68,7 @@ module.exports = {
         }
 
         if(!command){
-            if(!isCat(name,check)){
+            if(!isCat(name, check)){
                 embed.setTitle('Categories for this server:');
                 let i=0;
                 categories.forEach((cat) => {
@@ -80,27 +80,27 @@ module.exports = {
                         i=0;
                     }
                 })
-                return message.channel.send(embed);
+                return message.channel.send({embeds: [embed]});
             }
             embed.setTitle(client.util.capitalize(name))
             if(name=='guild'){
                 commands.forEach(c => {
                     if(c.guild && (c.guild == message.guild.id || c.guild.includes(message.guild.id))) embed.addField(c.name,`\`${prefix}help ${c.name}\`\n\u200b`, true);
                 })
-                return message.channel.send(embed);
+                return message.channel.send({embeds: [embed]});
             }
             commands.forEach(c => {
                 if(c.category==name && c.name != 'help') embed.addField(c.name,`\`${prefix}help ${c.name}\`\n\u200b`, true);
             })
-            return message.channel.send(embed)
+            return message.channel.send({embeds: [embed]})
         }
         embed.setTitle(client.util.capitalize(command.name))
-        if(command.description) embed.addField('Description:', command.description)
-        if(command.aliases) embed.addField('Aliases:', command.aliases.join(', '))
-        if(command.usage) embed.addField('Usage:', `\`${prefix}${command.name} ${command.usage}\``)
-        if(command.disp) embed.addField('Permisions required:', command.disp)
-        if(command.special_perms) embed.addField('Special role required:', role(command.special_perms))
-        if(command.category) embed.addField('Category:',client.util.capitalize(command.category))
-        return message.channel.send(embed)
+        command.description && embed.addField('Description:', command.description)
+        command.aliases && embed.addField('Aliases:', command.aliases.join(', '))
+        command.usage && embed.addField('Usage:', `\`${prefix}${command.name} ${command.usage}\``)
+        command.disp && embed.addField('Permisions required:', command.disp)
+        command.special_perms && embed.addField('Special role required:', role(command.special_perms))
+        command.category && embed.addField('Category:',client.util.capitalize(command.category))
+        return message.channel.send({embeds: [embed]})
 	}
 };

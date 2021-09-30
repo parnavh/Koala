@@ -41,15 +41,15 @@ module.exports = {
                             if(client.cache.config[message.guild.id].voice_enabled) delete client.cache.config[message.guild.id].voice_enabled
                             base.setDescription("Voice Announcement is now enabled")
                             client.firebase.update_config(message.guild.id)
-                            return message.channel.send(base)
+                            return message.channel.send({embeds: [base]})
                         }
                         base.setDescription("Voice Announcement is already enabled")
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
 
                     case 'disable':
                         if(client.cache.config[message.guild.id] && client.cache.config[message.guild.id].voice_disabled == true) {
                             base.setDescription("Voice Announcement is already disabled")
-                            return message.channel.send(base)
+                            return message.channel.send({embeds: [base]})
                         }
                         if(!client.cache.config[message.guild.id]) 
                             client.cache.config[message.guild.id] = {}
@@ -59,12 +59,12 @@ module.exports = {
                             delete client.cache.config[message.guild.id].voice_ignored
                         client.firebase.update_config(message.guild.id)
                         base.setDescription("Voice Announcement is now disabled")
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
                     default:
                         base.addField("Announce:", "Announces when someone joins a voice channel", false)
                             .addField("enable", `\`${prefix}voice announce enable\``, true)
                             .addField("disable", `\`${prefix}voice announce disable\``, true)
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
                 }
             case 'voices':
             case 'speech':
@@ -76,12 +76,12 @@ module.exports = {
                         delete client.cache.config[message.guild.id].voice_speech
                         client.firebase.update_config(message.guild.id)
                         base.setDescription("Speech has been reset")
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
 
                     case 'all':
                     case 'list':
                         base.setDescription("List of all available voices/speech:\n[Voice list](https://docs.aws.amazon.com/polly/latest/dg/voicelist.html)")
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
                         
                     default:
                         if(client.util.aws_voices.includes(option)) {
@@ -90,12 +90,12 @@ module.exports = {
                             if(!client.cache.config[message.guild.id]) client.cache.config[message.guild.id] = {}
                             client.cache.config[message.guild.id].voice_speech = option
                             client.firebase.update_config(message.guild.id)
-                            return message.channel.send(base)
+                            return message.channel.send({embeds: [base]})
                         }
                         base.addField("Speech:", "Change the default voice/speech for this server:", false)
                             .addField("List", `\`${prefix}voice speech list\``, true)
                             .addField("Reset", `\`${prefix}voice speech reset\``, true)
-                        return message.channel.send(base)
+                        return message.channel.send({embeds: [base]})
                 }
             // case 'message':
             //     switch (args.shift()) {
@@ -106,14 +106,14 @@ module.exports = {
             //                 client.cache.config[message.guild.id].voice_message_first = opt_1
             //                 client.firebase.update_config(message.guild.id)
             //                 base.setDescription("Voice message has been set")
-            //                 return message.channel.send(base)
+            //                 return message.channel.send({embeds: [base]})
             //             }
             //             if(client.cache.config[message.guild.id] && client.cache.config[message.guild.id].voice_message_first) {
             //                 base.setDescription(`First Message in this server is:\n${client.cache.config[message.guild.id].voice_message_first}`)
-            //                 return message.channel.send(base)
+            //                 return message.channel.send({embeds: [base]})
             //             }
             //             base.setDescription("Default message is")
-            //             return message.channel.send(base)
+            //             return message.channel.send({embeds: [base]})
                         
             //         case 'general':
             //             let opt_2 = args.shift()
@@ -122,22 +122,22 @@ module.exports = {
             //                 client.cache.config[message.guild.id].voice_message_general = opt_2
             //                 client.firebase.update_config(message.guild.id)
             //                 base.setDescription("Voice message has been set")
-            //                 return message.channel.send(base)
+            //                 return message.channel.send({embeds: [base]})
             //             }
             //             base.setDescription("No message provided, Terminating command")
-            //             return message.channel.send(base)
+            //             return message.channel.send({embeds: [base]})
 
             //         default:
             //             base.addField("Message:", "Change the default voice message used when you join a vc:", false)
             //                 .addField("First", `Used when you are the first\n\`${prefix}voice message first\``, true)
             //                 .addField("General", `Used generally\n\`${prefix}voice message general\``, true)
-            //             return message.channel.send(base)
+            //             return message.channel.send({embeds: [base]})
             //     }
             case 'ignored':
             case 'ignore':
                 let channels_1 = []
                 base.setDescription("Send the id/ids of the channels you want to disable:\nThis can be done my enabling developer mode in User Settings > Advanced > Enable Developer Mode, then right click your voice channel and copy its id\n If you want to disable multiple channels, seperate their ids using a space")
-                message.channel.send(base)
+                message.channel.send({embeds: [base]})
                 const filter_1 = m => (m.author.id == message.author.id)
                 let collected_1
                 try {
@@ -156,20 +156,20 @@ module.exports = {
                 })
                 if(channels_1.length == 0) {
                     base.setDescription("No channels found, Terminating command")
-                    return message.channel.send(base)
+                    return message.channel.send({embeds: [base]})
                 }
                 if(!client.cache.config[message.guild.id]) client.cache.config[message.guild.id] = {}
                 client.cache.config[message.guild.id].voice_ignored = channels_1
                 client.firebase.update_config(message.guild.id)
                 base.setDescription("Ignored channels have been set")
-                return message.channel.send(base)
+                return message.channel.send({embeds: [base]})
             case 'enabled':
             case 'enable':
                 conf = client.cache.config[message.guild.id] ? client.cache.config[message.guild.id] : null
                 if(!conf || typeof conf.voice_disabled == "undefined" || typeof conf.voice_ignored != "undefined") return message.channel.send(base.setDescription("For enabling specific channels you have to disable announce"))
                 let channels_2 = [], to_remove = []
                 base.setDescription("Send the id/ids of the channels you want to enable:\nThis can be done my enabling developer mode in User Settings > Advanced > Enable Developer Mode, then right click your voice channel and copy its id\n If you want to disable multiple channels, seperate their ids using a space")
-                message.channel.send(base)
+                message.channel.send({embeds: [base]})
                 const filter_2 = m => (m.author.id == message.author.id)
                 let collected_2
                 try {
@@ -190,7 +190,7 @@ module.exports = {
                 })
                 if(channels_2.length == 0 && to_remove.length == 0) {
                     base.setDescription("No channels found, Terminating command")
-                    return message.channel.send(base)
+                    return message.channel.send({embeds: [base]})
                 }
                 if(!client.cache.config[message.guild.id]) client.cache.config[message.guild.id] = {}
                 if(to_remove.length != 0 ) {
@@ -207,9 +207,9 @@ module.exports = {
                 }
                 client.firebase.update_config(message.guild.id)
                 base.setDescription("Enabled channels have been set")
-                return message.channel.send(base)
+                return message.channel.send({embeds: [base]})
             default:
-                return message.channel.send(default_embed)
+                return message.channel.send({embeds: [default_embed]})
         }
     },
 };

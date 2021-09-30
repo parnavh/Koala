@@ -1,3 +1,5 @@
+const { createAudioPlayer } = require('@discordjs/voice')
+
 module.exports = {
     name : 'speaker', 
     description : 'Handles the queue and playing of audio',
@@ -11,14 +13,14 @@ module.exports = {
         const {voice} = client.cache;
         const guid = vc.guild.id;
 
-        if(!voice[guid])
+        if (!voice[guid])
             voice[guid] = {
-                queue : [],
-                vc : [],
-                delay : [],
+                queue: [],
+                vc: [],
+                delay: [],
                 speaker : [],
-                isPlaying : false,
-                dispatcher : null,
+                isPlaying: false,
+                player: createAudioPlayer()
             };
 
         var server = voice[guid];

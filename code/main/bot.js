@@ -4,19 +4,31 @@ const call = require('./command.js');
 const rim = require('rimraf'); const fs = require('fs'); const minigames = require('../extensions/minigames')
 const firebase = require('../extensions/firebase.js'); const util = require('../extensions/util.js');
 const emoji = require('../extensions/emojis.js'); const csgo = require('../extensions/csgo.js');
-const my_intents = new Intents(Intents.ALL)
-my_intents.remove(['GUILD_PRESENCES', 'GUILD_MESSAGE_TYPING'])
+const intents = [
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_BANS,
+    Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+    Intents.FLAGS.GUILD_INTEGRATIONS,
+    Intents.FLAGS.GUILD_INVITES,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILD_VOICE_STATES,
+    Intents.FLAGS.GUILD_WEBHOOKS,
+];
 
 module.exports = class Bot extends Client {
     constructor() {
-        super({ ws: {intents: my_intents}, partials: ['MESSAGE', 'CHANNEL', 'REACTION']});
+        super({ intents, partials: ['MESSAGE', 'CHANNEL', 'REACTION']});
         this.once('ready', () => {
             console.log('Ready');
             this.user.setPresence({
-                activity:{
-                    type: "LISTENING",
-                    name: "`help"
-                }
+                activities: [{
+                    type: "WATCHING",
+                    name: "you waste time"
+                }]
             })
             fs.mkdirSync('./junk/temp');
         })
@@ -38,7 +50,7 @@ module.exports = class Bot extends Client {
             sudo: {}
         }
 
-        this.on('message' , message => {
+        this.on('messageCreate' , message => {
             // Message handler
             if(message.author.bot || !message.guild) return ;
 
@@ -56,7 +68,7 @@ module.exports = class Bot extends Client {
                 call.execute(this,message,finalPrefix);
         });
         
-        this.on('message', message => {
+        this.on('messageCreate', message => {
             // Automatic reaction handler
             let channel = message.channel, id = message.id
             if(message.author.bot || !message.guild) return
@@ -75,7 +87,7 @@ module.exports = class Bot extends Client {
             }, 1000);
         })
 
-        this.on('message', message => {
+        this.on('messageCreate', message => {
             // Custom message filter
             if(!message.guild || message.guild.id != "524148002269560833") return
             if(message.channel.id != "728660301750468682") return
@@ -87,12 +99,7 @@ module.exports = class Bot extends Client {
 
         this.on("voiceStateUpdate", (oldMember, newMember) => {
             // Voice announcements
-            if (
-                (newMember && newMember.member.user.bot) ||
-                (oldMember && oldMember.member.user.bot)
-            )
-                return;
-
+            if(newMember?.channel?.type == "GUILD_STAGE_VOICE" || oldMember?.channel?.type == "GUILD_STAGE_VOICE") return;
             this.helper.get("main-vc").execute(oldMember, newMember);
         });
 
@@ -117,70 +124,6 @@ module.exports = class Bot extends Client {
         this.on('guildMemberAdd', member => {
             // this.helper.get('guild-add').execute(this, member);
         });
-        
-        this.on('messageReactionAdd', async ( reaction, user ) => {
-            // Teams reaction role
-            if ( reaction.message.id != "871965230593355837" ) return
-            if ( reaction.message.partial ) await reaction.message.fetch();
-            if ( reaction.partial ) await reaction.fetch();
-            if ( user.bot ) return;
-            const emojis = ['teams', 'teams_b1', 'teams_b2']
-            if( !emojis.includes(reaction.emoji.name) ) return;
-            
-            let to_react
-
-            switch ( reaction.emoji.name ) {
-                case 'teams':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams");
-                    break;
-
-                case 'teams_b1':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams-b1");
-                    break;
-
-                case 'teams_b2':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams-b2");
-                    break;
-            
-                default:
-                    return;
-            }
-            
-            await reaction.message.guild.members.cache.get(user.id).roles.add(to_react)
-        })
-
-
-        this.on('messageReactionRemove', async ( reaction, user ) => {
-            // Teams reaction role
-            if ( reaction.message.id != "871965230593355837" ) return
-            if ( reaction.message.partial ) await reaction.message.fetch();
-            if ( reaction.partial ) await reaction.fetch();
-            if ( user.bot ) return;
-            const emojis = ['teams', 'teams_b1', 'teams_b2']
-            if( !emojis.includes(reaction.emoji.name) ) return;
-            
-            let to_react
-
-            switch ( reaction.emoji.name ) {
-                case 'teams':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams");
-                    break;
-
-                case 'teams_b1':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams-b1");
-                    break;
-
-                case 'teams_b2':
-                    to_react = reaction.message.guild.roles.cache.find(role => role.name == "teams-b2");
-                    break;
-            
-                default:
-                    return;
-            }
-            
-            await reaction.message.guild.members.cache.get(user.id).roles.remove(to_react)
-        })
-
     }
 
     async start() {

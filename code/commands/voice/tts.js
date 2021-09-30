@@ -1,3 +1,6 @@
+const bot = require("../../main/bot")
+const { Message } = require('discord.js')
+
 module.exports = {
     name : 'tts',
     aliases : ['t'],
@@ -8,7 +11,12 @@ module.exports = {
     disp : ['Send Messages'],
     category : 'voice',
 
-    
+    /**
+     * @param {bot} client 
+     * @param {Message} message 
+     * @param {Array} args 
+     * @returns 
+     */
     async execute (client,message,args){
         const vc = message.member.voice.channel;
 
@@ -18,13 +26,13 @@ module.exports = {
         let text=``,
             speaker = client.util.getVoiceSpeech(message.guild.id),
             temp='';
-        for(let i=0;i<args.length;i++){
+        for(let i=0; i<args.length; i++){
             if(args[i].toString().startsWith('=>')){
                 temp = args[i].toString().substring(2,args[i].length)
                 if(client.util.aws_voices.includes(temp))
                     speaker = temp[0].toUpperCase()+temp.substring(1,temp.length);
             } else 
-                text+=args[i]+' ';
+                text += args[i]+' ';
         }
         client.helper.get('speaker').execute(vc,text,speaker);
     }

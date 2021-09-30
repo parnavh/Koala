@@ -11,43 +11,39 @@ module.exports = {
      * @returns
      */
     async execute(oldMember, newMember) {
-        const { helper } = newMember.client;
         const { client } = newMember;
-        if (!oldMember.channelID) {
-            if (!client.util.isVoiceAllowed(newMember)) return;
-            let text = `${newMember.member.displayName} has joined`,
-                size = newMember.channel.members.size;
-
-            if (size == 1) text = `Welcome ${newMember.member.displayName}`;
-
-            helper.get("speaker").execute(newMember.channel, text, null, 1100);
+        const speaker = client.helper.get("speaker").execute;
+        
+        if (newMember.channelId && oldMember.channelId) {
+            if (
+                oldMember.channel.members == 1 &&
+                oldMember.channelId == oldMember.guild.me.voice?.channelId
+            ) client.util.getVoice(oldMember.guild.id).disconnect();
+            return;
         }
-        if (!newMember.channelID) {
-            if (!client.util.isVoiceAllowed(oldMember)) return;
-            let text,
-                size = oldMember.channel.members.size;
+
+        if (newMember.channelId) {
+            if (!client.util.isVoiceAllowed(newMember) || newMember.member.user.bot) return;
+            let text = `${newMember.member.displayName} has joined`;
+
+            if (newMember.channel.members.size == 1) text = `Welcome ${newMember.member.displayName}`;
+
+            speaker(newMember.channel, text, null, 1100);
+            return;
+        }
+
+        if (oldMember.channelId) {
+            let text, { size } = oldMember.channel.members;
             if (
                 size == 1 &&
-                oldMember.guild.voice &&
-                oldMember.guild.voice.channelID == oldMember.channelID
+                oldMember.guild.me.voice?.channelId == oldMember.channelId
             )
-                oldMember.channel.leave();
-            else if(size != 0) {
+                client.util.getVoice(oldMember.guild.id).disconnect()
+            else if(size != 0 && client.util.isVoiceAllowed(oldMember) && !oldMember.member.user.bot) {
                 text = `${oldMember.member.displayName} has left`;
-                helper.get("speaker").execute(oldMember.channel, text, null, 0);
+                speaker(oldMember.channel, text, null, 0);
             }
-        }
-        if (newMember.channel && oldMember.channel) {
-            let i = oldMember.channel.members.size;
-            if (
-                i == 1 &&
-                oldMember.channel &&
-                oldMember.guild.voice &&
-                oldMember.guild.voice.channel &&
-                oldMember.channel.id == oldMember.guild.voice.channel.id
-            ) {
-                oldMember.channel.leave();
-            }
+            return;
         }
     },
 };
