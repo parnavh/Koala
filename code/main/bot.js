@@ -114,8 +114,9 @@ module.exports = class Bot extends Client {
         })
 
         this.on('voiceStateUpdate', (voice_1, voice_2) => {
-            if(!voice_2.channelID && ( voice_1.member.id == this.user.id ) ) {
+            if(!voice_2.channelId && ( voice_1.member.id == this.user.id ) ) {
                 //koala was disconnected
+                this.util.getVoice(voice_1.guild.id).destroy()
                 if(this.cache.voice[voice_1.guild.id])
                     delete this.cache.voice[voice_1.guild.id]
             }

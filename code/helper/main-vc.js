@@ -16,7 +16,7 @@ module.exports = {
         
         if (newMember.channelId && oldMember.channelId) {
             if (
-                oldMember.channel.members == 1 &&
+                oldMember.channel.members.size == 1 &&
                 oldMember.channelId == oldMember.guild.me.voice?.channelId
             ) client.util.getVoice(oldMember.guild.id).disconnect();
             return;

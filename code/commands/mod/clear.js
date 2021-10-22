@@ -45,10 +45,11 @@ module.exports = {
             const filter = m => (m.author.id==message.author.id && acceptable.includes(m.content));
             
             try {
-                collected = await message.channel.awaitMessages(filter,{
+                collected = await message.channel.awaitMessages({
                     time : '15000',
                     max : '1',
-                    errors : ['time']
+                    errors : ['time'],
+                    filter
                 })
             } catch (error) {
                 delete2 = await message.channel.send("No valid input provided in time, Terminating the command");

@@ -102,9 +102,19 @@ module.exports = class Util {
             .setColor('#B46547')
             .setFooter(`At your service, ${message.member.displayName}`, message.author.displayAvatarURL({dynamic : true}))
             .setAuthor(`${message.guild.name}`, message.guild.iconURL({dynamic : true}))
-        if(text) toReturn.setDescription(text);
-        if(title) toReturn.setTitle(title)
+        text && toReturn.setDescription(text);
+        title && toReturn.setTitle(title);
         return toReturn;
+    }
+
+    getDefaultEmbed(title, text) {
+        let to_return = new MessageEmbed()
+            .setColor("#B46547")
+        
+        title && to_return.setTitle(title)
+        text && to_return.setDescription(text)
+
+        return to_return
     }
 
     capitalize = (str) => str.charAt(0).toUpperCase() + str.substring(1)

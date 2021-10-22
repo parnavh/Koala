@@ -21,16 +21,16 @@ module.exports = {
         vc = message.member.voice.channel;
         if(!vc) {
             base.setDescription("You should be in a voice channel to play minigames");
-            message.channel.send(base)
+            message.channel.send({embeds: [base]})
         }
 
         try {
             m = await client.minigames.youtube_together(vc)
             base.setDescription(m)
-            message.channel.send(base)
+            message.channel.send({embeds: [base]})
         } catch (error) {
             base.setDescription(error)
-            message.channel.send(base)
+            message.channel.send({embeds: [base]})
         }
     }
 };

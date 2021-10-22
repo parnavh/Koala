@@ -13,7 +13,7 @@ module.exports = {
     /** @param {Message} message */
     execute(client,message,args){
         if (message.guild.me.voice.channel) {
-            client.util.getVoice(message.guild.me.voice.channel).disconnect();
+            client.util.getVoice(message.guild.id).disconnect();
             delete client.cache.voice[message.guild.id];
             message.react('✅');
         } else {

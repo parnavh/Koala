@@ -18,7 +18,7 @@ module.exports = {
         
         if(!command) return;
 
-        if(!message.member.permissions.has('ADMINISTRATOR') || !message.member.permissions.has(command.perms))
+        if(!message.member.permissions.has(command.perms) && !message.member.permissions.has('ADMINISTRATOR'))
             return message.channel.send(`You do not have the required permisions to use this command\nPermissions required: ${command.disp}`);
 
         if(command.special_perms){

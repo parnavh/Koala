@@ -23,17 +23,17 @@ module.exports = {
         vc = message.member.voice.channel;
         if(!vc) {
             base.setDescription("You should be in a voice channel to play minigames");
-            message.channel.send(base)
+            message.channel.send({embeds: [base]})
         }
         switch (args.shift()) {
             case "poker":
                 try {
                     m = await client.minigames.poker(vc)
                     base.setDescription(m)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 } catch (error) {
                     base.setDescription(error)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 }
                 break;
 
@@ -41,10 +41,10 @@ module.exports = {
                 try {
                     m = await client.minigames.betrayal(vc)
                     base.setDescription(m)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 } catch (error) {
                     base.setDescription(error)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 }
                 break;
 
@@ -52,10 +52,10 @@ module.exports = {
                 try {
                     m = await client.minigames.fishing(vc)
                     base.setDescription(m)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 } catch (error) {
                     base.setDescription(error)
-                    message.channel.send(base)
+                    message.channel.send({embeds: [base]})
                 }
                 break;
         
@@ -63,7 +63,7 @@ module.exports = {
                 base.addField("Poker", `\`${prefix}mini poker\``, true)
                 base.addField("Betrayal", `\`${prefix}mini betrayal\``, true)
                 base.addField("Fishing", `\`${prefix}mini fishing\``,  true)
-                message.channel.send(base)
+                message.channel.send({embeds: [base]})
                 break;
         }
 
